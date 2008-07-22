@@ -35,8 +35,8 @@ import java.awt.*;
 /**
  * My version of the Conway's Game of Life.
  *
- * @author	Jared Klett
- * @version	1.0 (4/14/1996)
+ * @author Jared Klett
+ * @version 1.0 (4/14/1996)
  * @version 2.0 (7/22/2008)
  */
 
@@ -117,67 +117,52 @@ public class Life implements Runnable {
 
     public void updateWorld() {
         boolean[][] tempworld = new boolean[world.length][world[0].length];
-
-        for(int i = 0; i < world.length; i++) {
+        for (int i = 0; i < world.length; i++) {
             System.arraycopy(world[i], 0, tempworld[i], 0, world[i].length);
         }
-
-        for(int i = 0; i < world.length; i++) {
-            for(int j = 0; j < world[i].length; j++) {
+        for (int i = 0; i < world.length; i++) {
+            for (int j = 0; j < world[i].length; j++) {
                 int left = i - 1;
                 int right = i + 1;
-
                 // TODO: replace with mod?
-                if(i == 0) {
+                if (i == 0) {
                     left = world.length - 1;
                 } else if (i == world.length - 1) {
                     right = 0;
                 }
-
                 int top = j - 1;
                 int bottom = j + 1;
-
-                if(j == 0) {
+                if (j == 0) {
                     top = world[i].length - 1;
-                } else if(j == world[i].length - 1) {
+                } else if (j == world[i].length - 1) {
                     bottom = 0;
                 }
-
                 int neighbors = 0;
-
-                if(tempworld[left][top]) {
+                if (tempworld[left][top]) {
                     neighbors++;
                 }
-
-                if(tempworld[i][top]) {
+                if (tempworld[i][top]) {
                     neighbors++;
                 }
-
-                if(tempworld[right][top]) {
+                if (tempworld[right][top]) {
                     neighbors++;
                 }
-
-                if(tempworld[left][j]) {
+                if (tempworld[left][j]) {
                     neighbors++;
                 }
-
-                if(tempworld[right][j]) {
+                if (tempworld[right][j]) {
                     neighbors++;
                 }
-
-                if(tempworld[left][bottom]) {
+                if (tempworld[left][bottom]) {
                     neighbors++;
                 }
-
-                if(tempworld[i][bottom]) {
+                if (tempworld[i][bottom]) {
                     neighbors++;
                 }
-
-                if(tempworld[right][bottom]) {
+                if (tempworld[right][bottom]) {
                     neighbors++;
                 }
-
-                if((neighbors < 2) || (neighbors > 3)) {
+                if ((neighbors < 2) || (neighbors > 3)) {
                     world[i][j] = false;
                 } else if (neighbors == 3) {
                     world[i][j] = true;
@@ -188,8 +173,7 @@ public class Life implements Runnable {
 
     public void drawWorld() {
         buffer.setColor(Color.black);
-        buffer.fillRect (0, 0, d.width, d.height);
-
+        buffer.fillRect(0, 0, d.width, d.height);
         for (int i = 0; i < world.length; i++) {
             for (int j = 0; j < world[i].length; j++) {
                 if (world[i][j]) {

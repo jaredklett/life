@@ -32,13 +32,13 @@ package org.javaforge.life;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * My version of the Conway's Game of Life.
  *
- * @author	Jared Klett
+ * @author Jared Klett
  * @version	1.0 (4/14/1996)
  * @version 2.0 (7/22/2008)
  */
