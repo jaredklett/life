@@ -1,0 +1,38 @@
+<!-- $Id: build.xml,v 1.1 2008/07/22 20:52:08 jklett Exp $ -->
+<project name="Life" default="build" basedir=".">
+
+    <!--
+    <property name="lib" value="lib" />
+    -->
+    <property name="src" value="src" />
+	<property name="build" value="classes" />
+    <property name="jarfile" value="life.jar" />
+    <property name="etc" value="etc" />
+<!--
+    <path id="forgePath">
+		<pathelement path="${lib}/log4j.jar:${lib}/javax.servlet.jar" />
+	</path>
+-->
+    <target name="compile">
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}" />
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build}" debug="on" deprecation="off"/>
+        <!--
+            <classpath refid="forgePath" />
+        </javac>
+-->
+    </target>
+
+	<target name="package" depends="compile">
+		<jar destfile="${jarfile}" basedir="${build}" manifest="${etc}/MainClass" />
+	</target>
+
+	<target name="build" depends="package" />
+
+    <target name="clean">
+        <delete dir="${build}" />
+        <delete file="${jarfile}" />
+    </target>
+
+</project>
