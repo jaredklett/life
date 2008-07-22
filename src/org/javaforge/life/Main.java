@@ -32,8 +32,8 @@ package org.javaforge.life;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * My version of the Conway's Game of Life.
@@ -43,52 +43,52 @@ import java.awt.event.MouseListener;
  * @version 2.0 (7/22/2008)
  */
 
-public class Main extends Frame {
+public class Main {
 
     private Life life;
-    private Window window;
+    private JFrame frame;
     private GraphicsDevice device;
 
     public Main() {
-        super();
         GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
         device = genv.getDefaultScreenDevice();
         if (!device.isFullScreenSupported()) {
-            JOptionPane.showMessageDialog(this, "Sorry, but full screen is not supported on this computer.\nPerhaps you need to upgrade your Java virtual machine.", "Full screen not available", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Sorry, but full screen is not supported on this computer.\nPerhaps you need to upgrade your Java virtual machine.", "Full screen not available", JOptionPane.WARNING_MESSAGE);
             System.exit(1);
         }
-    }
-
-    public void addNotify() {
-        super.addNotify();
-        window = new Window(this);
-        window.setBackground(Color.black);
-        window.setLayout(new BorderLayout());
-        device.setFullScreenWindow(window);
+        frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.getContentPane().setBackground(Color.BLACK);
+        //frame.getRootPane().setForeground(Color.BLACK);
+        frame.addKeyListener(
+                new KeyListener() {
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_UP)
+                            life.setDelay(life.getDelay() - 10);
+                        else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+                            life.setDelay(life.getDelay() + 10);
+                    }
+                    public void keyReleased(KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                            life.setRunning(false);
+                            device.setFullScreenWindow(null);
+                            System.exit(0);
+                        }
+                    }
+                    public void keyTyped(KeyEvent e) { }
+                }
+        );
+        device.setFullScreenWindow(frame);
     }
 
     public void begin() {
-        life = new Life(window);
-        window.addMouseListener(
-                new MouseListener() {
-                    public void mouseClicked(MouseEvent e) {
-                        device.setFullScreenWindow(null);
-                        life.setRunning(false);
-                        System.exit(0);
-                    }
-                    public void mouseEntered(MouseEvent e) {}
-                    public void mouseExited(MouseEvent e) {}
-                    public void mousePressed(MouseEvent e) {}
-                    public void mouseReleased(MouseEvent e) {}
-                }
-        );
+        life = new Life(frame);
         life.setRunning(true);
         life.start();
     }
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.addNotify();
         main.begin();
     }
 

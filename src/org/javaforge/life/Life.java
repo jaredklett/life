@@ -47,10 +47,12 @@ public class Life implements Runnable {
 
     private Dimension d;
 
+    private long delay = 100;
     private boolean running;
     private Image offscreen;
     private Graphics buffer;
-    //private Label countdown;
+    private Label countdown;
+    private Label speed;
     public static final int CELL_SIZE = 4;
     public static final int RESEED_LIMIT = 2000;
 
@@ -80,10 +82,15 @@ public class Life implements Runnable {
 
         offscreen = window.createImage(w, h);
         buffer = offscreen.getGraphics();
-        //countdown = new Label("Ready");
-        //countdown.setForeground(Color.WHITE);
-        //Font font = new Font("SansSerif", Font.BOLD, 14);
-        //countdown.setFont(font);
+        countdown = new Label("Ready");
+        countdown.setForeground(Color.WHITE);
+        countdown.setBackground(Color.BLACK);
+        Font font = new Font("SansSerif", Font.BOLD, 14);
+        countdown.setFont(font);
+        speed = new Label("Ready");
+        speed.setForeground(Color.GRAY);
+        speed.setBackground(Color.BLACK);
+        speed.setFont(font);
     }
 
     public void reseed() {
@@ -99,18 +106,25 @@ public class Life implements Runnable {
 
     public void run() {
         int c = 0;
-        //countdown.setBounds(0, 0, 100, 50);
+        int reseedCount = 1;
+        window.add(countdown);
+        countdown.setBounds(0, 0, 100, 20);
+        window.add(speed);
+        speed.setBounds(0, 24, 100, 20);
         while (running) {
-            if (c > RESEED_LIMIT) {
+            if (c > (RESEED_LIMIT * reseedCount)) {
                 reseed();
                 c = 0;
+                reseedCount++;
             }
             //countdown.setText("Next panspermic event in " + Integer.toString(RESEED_LIMIT - c) + " iterations");
+            countdown.setText(Integer.toString(RESEED_LIMIT - c));
+            speed.setText(Long.toString(delay));
             updateWorld();
             drawWorld();
             Graphics g = window.getGraphics();
             g.drawImage(offscreen, (d.width - offscreen.getWidth(window)) / 2, (d.height - offscreen.getHeight(window)) / 2, window);
-            try { Thread.sleep(10); } catch (InterruptedException e) { /* ignored */ }
+            try { Thread.sleep(delay); } catch (InterruptedException e) { /* ignored */ }
             c++;
         }
     }
@@ -188,8 +202,17 @@ public class Life implements Runnable {
         new Thread(this).start();
     }
 
+    public long getDelay() {
+        return delay;
+    }
+
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public void setDelay(long delay) {
+        if (delay >= 10)
+            this.delay = delay;
     }
 
 } // class Life
