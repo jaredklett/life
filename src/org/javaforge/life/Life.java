@@ -118,7 +118,7 @@ public class Life implements Runnable {
                 reseedCount++;
             }
             //countdown.setText("Next panspermic event in " + Integer.toString(RESEED_LIMIT - c) + " iterations");
-            countdown.setText(Integer.toString(RESEED_LIMIT - c));
+            countdown.setText(Integer.toString((RESEED_LIMIT * reseedCount) - c));
             speed.setText(Long.toString(delay));
             updateWorld();
             drawWorld();
