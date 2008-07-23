@@ -47,18 +47,44 @@ public class Life implements Runnable {
 
     private Dimension d;
 
+    private int cellSize;
     private long delay = 100;
     private boolean running;
     private Image offscreen;
     private Graphics buffer;
+    private Thread thread;
     private Label countdown;
     private Label speed;
-    public static final int CELL_SIZE = 4;
+    private Label sizeLabel;
+    public static final int DEFAULT_CELL_SIZE = 5;
     public static final int RESEED_LIMIT = 2000;
 
     public Life(Window window) {
         this.window = window;
         d = window.getSize();
+
+        Font font = new Font("SansSerif", Font.BOLD, 14);
+
+        countdown = new Label("Ready");
+        countdown.setForeground(Color.DARK_GRAY);
+        countdown.setBackground(Color.BLACK);
+        countdown.setFont(font);
+
+        speed = new Label("Ready");
+        speed.setForeground(Color.GRAY);
+        speed.setBackground(Color.BLACK);
+        speed.setFont(font);
+
+        sizeLabel = new Label("Ready");
+        sizeLabel.setForeground(Color.WHITE);
+        sizeLabel.setBackground(Color.BLACK);
+        sizeLabel.setFont(font);
+
+        cellSize = DEFAULT_CELL_SIZE;
+        init();
+    }
+
+    public void init() {
         int w;
         int h;
         if (d.width < d.height) {
@@ -68,10 +94,8 @@ public class Life implements Runnable {
             w = d.height;
             h = d.height;
         }
-
         // Create a new world
-        world = new boolean[w / CELL_SIZE][h / CELL_SIZE];
-
+        world = new boolean[w / cellSize][h / cellSize];
         // Seed the world
         for (boolean[] aWorld : world) {
             for (int j = 0; j < aWorld.length; j++) {
@@ -79,18 +103,17 @@ public class Life implements Runnable {
                 aWorld[j] = random < 0.1;
             }
         }
-
         offscreen = window.createImage(w, h);
         buffer = offscreen.getGraphics();
-        countdown = new Label("Ready");
-        countdown.setForeground(Color.WHITE);
-        countdown.setBackground(Color.BLACK);
-        Font font = new Font("SansSerif", Font.BOLD, 14);
-        countdown.setFont(font);
-        speed = new Label("Ready");
-        speed.setForeground(Color.GRAY);
-        speed.setBackground(Color.BLACK);
-        speed.setFont(font);
+
+        window.add(countdown);
+        countdown.setBounds(0, 0, 100, 20);
+
+        window.add(speed);
+        speed.setBounds(0, 24, 100, 20);
+
+        window.add(sizeLabel);
+        sizeLabel.setBounds(0, 48, 100, 20);
     }
 
     public void reseed() {
@@ -105,12 +128,9 @@ public class Life implements Runnable {
     }
 
     public void run() {
+        sizeLabel.setText(Integer.toString(cellSize));
         int c = 0;
         int reseedCount = 1;
-        window.add(countdown);
-        countdown.setBounds(0, 0, 100, 20);
-        window.add(speed);
-        speed.setBounds(0, 24, 100, 20);
         while (running) {
             if (c > (RESEED_LIMIT * reseedCount)) {
                 reseed();
@@ -123,6 +143,7 @@ public class Life implements Runnable {
             updateWorld();
             drawWorld();
             Graphics g = window.getGraphics();
+            //System.out.println(g);
             g.drawImage(offscreen, (d.width - offscreen.getWidth(window)) / 2, (d.height - offscreen.getHeight(window)) / 2, window);
             try { Thread.sleep(delay); } catch (InterruptedException e) { /* ignored */ }
             c++;
@@ -192,18 +213,36 @@ public class Life implements Runnable {
             for (int j = 0; j < world[i].length; j++) {
                 if (world[i][j]) {
                     buffer.setColor(Color.cyan);
-                    buffer.fillOval(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    buffer.fillOval(j * cellSize, i * cellSize, cellSize, cellSize);
                 }
             }
         }
     }
 
     public void start() {
-        new Thread(this).start();
+        setRunning(true);
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    public void stop() {
+        setRunning(false);
+        thread.interrupt();
+        try { thread.join(1000); } catch (InterruptedException e) { /* ignored */ }
+        buffer.dispose();
+        offscreen.flush();
+        buffer = null;
+        offscreen = null;
+        //window.remove(countdown);
+        //window.remove(speed);
     }
 
     public long getDelay() {
         return delay;
+    }
+
+    public int getCellSize() {
+        return cellSize;
     }
 
     public void setRunning(boolean running) {
@@ -213,6 +252,16 @@ public class Life implements Runnable {
     public void setDelay(long delay) {
         if (delay >= 10)
             this.delay = delay;
+    }
+
+    public void setCellSize(int cellSize) {
+        // TODO: no magic numbers
+        if (cellSize > 1 && cellSize < 16) {
+            this.cellSize = cellSize;
+            stop();
+            init();
+            start();
+        }
     }
 
 } // class Life

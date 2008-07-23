@@ -59,7 +59,6 @@ public class Main {
         frame = new JFrame();
         frame.setUndecorated(true);
         frame.getContentPane().setBackground(Color.BLACK);
-        //frame.getRootPane().setForeground(Color.BLACK);
         frame.addKeyListener(
                 new KeyListener() {
                     public void keyPressed(KeyEvent e) {
@@ -67,6 +66,10 @@ public class Main {
                             life.setDelay(life.getDelay() - 10);
                         else if (e.getKeyCode() == KeyEvent.VK_DOWN)
                             life.setDelay(life.getDelay() + 10);
+                        else if (e.getKeyCode() == KeyEvent.VK_LEFT)
+                            life.setCellSize(life.getCellSize() - 1);
+                        else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+                            life.setCellSize(life.getCellSize() + 1);
                     }
                     public void keyReleased(KeyEvent e) {
                         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -83,7 +86,7 @@ public class Main {
 
     public void begin() {
         life = new Life(frame);
-        life.setRunning(true);
+        //life.setRunning(true);
         life.start();
     }
 
