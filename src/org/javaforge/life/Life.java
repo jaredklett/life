@@ -53,7 +53,7 @@ public class Life implements Runnable {
     private Dimension d;
 
     private int cellSize;
-    private long delay = 100;
+    private long delay;
     private boolean running;
     private Image offscreen;
     private Graphics buffer;
@@ -61,9 +61,11 @@ public class Life implements Runnable {
     private Label countdown;
     private Label speed;
     private Label sizeLabel;
-    private Label updownLabel = new Label("Hit up/down to go faster/slower");
-    private Label leftrightLabel = new Label("Hit right/left for bigger/smaller");
-    private Label pLabel = new Label("Hit P to add a predator");
+    private Label upLabel = new Label("Up : faster");
+    private Label downLabel = new Label("Down : slower");
+    private Label rightLabel = new Label("Right : bigger");
+    private Label leftLabel = new Label("Left : smaller");
+    private Label pLabel = new Label("P : predator");
     public static final int DEFAULT_CELL_SIZE = 5;
     public static final int RESEED_LIMIT = 2000;
 
@@ -92,13 +94,21 @@ public class Life implements Runnable {
         pLabel.setBackground(Color.BLACK);
         pLabel.setFont(font);
 
-        updownLabel.setForeground(Color.GREEN.darker());
-        updownLabel.setBackground(Color.BLACK);
-        updownLabel.setFont(font);
+        upLabel.setForeground(Color.GREEN.darker());
+        upLabel.setBackground(Color.BLACK);
+        upLabel.setFont(font);
 
-        leftrightLabel.setForeground(Color.YELLOW.darker());
-        leftrightLabel.setBackground(Color.BLACK);
-        leftrightLabel.setFont(font);
+        downLabel.setForeground(Color.GREEN.darker());
+        downLabel.setBackground(Color.BLACK);
+        downLabel.setFont(font);
+
+        leftLabel.setForeground(Color.YELLOW.darker());
+        leftLabel.setBackground(Color.BLACK);
+        leftLabel.setFont(font);
+
+        rightLabel.setForeground(Color.YELLOW.darker());
+        rightLabel.setBackground(Color.BLACK);
+        rightLabel.setFont(font);
 
         cellSize = DEFAULT_CELL_SIZE;
         init();
@@ -126,6 +136,8 @@ public class Life implements Runnable {
         offscreen = window.createImage(w, h);
         buffer = offscreen.getGraphics();
 
+        setDelay(100);
+
         window.add(countdown);
         countdown.setBounds(0, 0, 100, 20);
 
@@ -138,11 +150,17 @@ public class Life implements Runnable {
         window.add(pLabel);
         pLabel.setBounds(0, d.height - 20, 200, 20);
 
-        window.add(leftrightLabel);
-        leftrightLabel.setBounds(0, d.height - 40, 300, 20);
+        window.add(rightLabel);
+        rightLabel.setBounds(0, d.height - 40, 200, 20);
 
-        window.add(updownLabel);
-        updownLabel.setBounds(0, d.height - 60, 300, 20);
+        window.add(leftLabel);
+        leftLabel.setBounds(0, d.height - 60, 200, 20);
+
+        window.add(downLabel);
+        downLabel.setBounds(0, d.height - 80, 200, 20);
+
+        window.add(upLabel);
+        upLabel.setBounds(0, d.height - 100, 200, 20);
     }
 
     public void reseed() {
@@ -170,7 +188,7 @@ public class Life implements Runnable {
     }
 
     public void run() {
-        sizeLabel.setText(Integer.toString(cellSize));
+        sizeLabel.setText(cellSize + " px");
         int c = 0;
         int reseedCount = 1;
         while (running) {
@@ -181,7 +199,6 @@ public class Life implements Runnable {
             }
             //countdown.setText("Next panspermic event in " + Integer.toString(RESEED_LIMIT - c) + " iterations");
             countdown.setText(Integer.toString((RESEED_LIMIT * reseedCount) - c));
-            speed.setText(Long.toString(delay));
             updateWorld();
             drawWorld();
             Graphics g = window.getGraphics();
@@ -322,8 +339,10 @@ public class Life implements Runnable {
     }
 
     public void setDelay(long delay) {
-        if (delay >= 10)
+        if (delay >= 10) {
             this.delay = delay;
+            speed.setText(((1000 / delay) * 60) + " rpm");
+        }
     }
 
     public void setCellSize(int cellSize) {
