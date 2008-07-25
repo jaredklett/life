@@ -61,6 +61,8 @@ public class Life implements Runnable {
     private Label countdown;
     private Label speed;
     private Label sizeLabel;
+    private Label updownLabel = new Label("Hit up/down to go faster/slower");
+    private Label leftrightLabel = new Label("Hit right/left for bigger/smaller");
     private Label pLabel = new Label("Hit P to add a predator");
     public static final int DEFAULT_CELL_SIZE = 5;
     public static final int RESEED_LIMIT = 2000;
@@ -89,6 +91,14 @@ public class Life implements Runnable {
         pLabel.setForeground(Color.RED.darker());
         pLabel.setBackground(Color.BLACK);
         pLabel.setFont(font);
+
+        updownLabel.setForeground(Color.GREEN.darker());
+        updownLabel.setBackground(Color.BLACK);
+        updownLabel.setFont(font);
+
+        leftrightLabel.setForeground(Color.YELLOW.darker());
+        leftrightLabel.setBackground(Color.BLACK);
+        leftrightLabel.setFont(font);
 
         cellSize = DEFAULT_CELL_SIZE;
         init();
@@ -127,6 +137,12 @@ public class Life implements Runnable {
 
         window.add(pLabel);
         pLabel.setBounds(0, d.height - 20, 200, 20);
+
+        window.add(leftrightLabel);
+        leftrightLabel.setBounds(0, d.height - 40, 300, 20);
+
+        window.add(updownLabel);
+        updownLabel.setBounds(0, d.height - 60, 300, 20);
     }
 
     public void reseed() {
