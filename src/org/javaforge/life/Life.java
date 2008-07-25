@@ -61,6 +61,7 @@ public class Life implements Runnable {
     private Label countdown;
     private Label speed;
     private Label sizeLabel;
+    private Label pLabel = new Label("Hit P to add a predator");
     public static final int DEFAULT_CELL_SIZE = 5;
     public static final int RESEED_LIMIT = 2000;
 
@@ -84,6 +85,10 @@ public class Life implements Runnable {
         sizeLabel.setForeground(Color.WHITE);
         sizeLabel.setBackground(Color.BLACK);
         sizeLabel.setFont(font);
+
+        pLabel.setForeground(Color.RED.darker());
+        pLabel.setBackground(Color.BLACK);
+        pLabel.setFont(font);
 
         cellSize = DEFAULT_CELL_SIZE;
         init();
@@ -119,6 +124,9 @@ public class Life implements Runnable {
 
         window.add(sizeLabel);
         sizeLabel.setBounds(0, 48, 100, 20);
+
+        window.add(pLabel);
+        pLabel.setBounds(0, d.height - 20, 200, 20);
     }
 
     public void reseed() {
@@ -127,20 +135,22 @@ public class Life implements Runnable {
             for (int j = 0; j < aWorld.length; j++) {
                 if (aWorld[j] == VACANT) {
                     aWorld[j] = random.nextInt(PREDATOR);
+                } else if (aWorld[j] == PREDATOR) {
+                    aWorld[j] = VACANT;
                 }
             }
         }
     }
 
     public void addPredator() {
-        for (int[] aWorld : world) {
-            for (int j = 0; j < aWorld.length; j++) {
-                if (aWorld[j] == VACANT) {
-                    aWorld[j] = PREDATOR;
-                    return;
-                }
-            }
+        Random random = new Random();
+        int x = random.nextInt(world.length);
+        int y = random.nextInt(world[x].length);
+        while (world[x][y] != VACANT) {
+            x = random.nextInt(world.length);
+            y = random.nextInt(world[x].length);
         }
+        setInWorld(x, y, PREDATOR);
     }
 
     public void run() {
@@ -159,7 +169,6 @@ public class Life implements Runnable {
             updateWorld();
             drawWorld();
             Graphics g = window.getGraphics();
-            //System.out.println(g);
             g.drawImage(offscreen, (d.width - offscreen.getWidth(window)) / 2, (d.height - offscreen.getHeight(window)) / 2, window);
             try { Thread.sleep(delay); } catch (InterruptedException e) { /* ignored */ }
             c++;
@@ -190,25 +199,30 @@ public class Life implements Runnable {
                 }
                 if (world[i][j] == PREDATOR) {
                     if (tempworld[left][top] == HERBIVORE) {
-                        world[left][top] = PREDATOR;
+                        setInWorld(left, top, PREDATOR);
                     } else if (tempworld[i][top] == HERBIVORE) {
-                        world[i][top] = PREDATOR;
+                        setInWorld(i, top, PREDATOR);
                     } else if (tempworld[right][top] == HERBIVORE) {
-                        world[right][top] = PREDATOR;
+                        setInWorld(right, top, PREDATOR);
                     } else if (tempworld[left][j] == HERBIVORE) {
-                        world[left][j] = PREDATOR;
+                        setInWorld(left, j, PREDATOR);
                     } else if (tempworld[right][j] == HERBIVORE) {
-                        world[right][j] = PREDATOR;
+                        setInWorld(right, j, PREDATOR);
                     } else if (tempworld[left][bottom] == HERBIVORE) {
-                        world[left][bottom] = PREDATOR;
+                        setInWorld(left, bottom, PREDATOR);
                     } else if (tempworld[i][bottom] == HERBIVORE) {
-                        world[i][bottom] = PREDATOR;
+                        setInWorld(i, bottom, PREDATOR);
                     } else if (tempworld[right][bottom] == HERBIVORE) {
-                        world[right][bottom] = PREDATOR;
+                        setInWorld(right, bottom, PREDATOR);
                     } else {
-                        world[right][bottom] = PREDATOR;
+                        Random random = new Random();
+                        int[] xdir = new int[] { left, right };
+                        int[] ydir = new int[] { top, bottom };
+                        int xrand = random.nextInt(xdir.length);
+                        int yrand = random.nextInt(ydir.length);
+                        setInWorld(xdir[xrand], ydir[yrand], PREDATOR);
                     }
-                    world[i][j] = VACANT;
+                    setInWorld(i, j, VACANT);
                 } else {
                     int neighbors = 0;
                     if (tempworld[left][top] == HERBIVORE) {
@@ -236,9 +250,9 @@ public class Life implements Runnable {
                         neighbors++;
                     }
                     if ((neighbors < 2) || (neighbors > 3)) {
-                        world[i][j] = VACANT;
+                        setInWorld(i, j, VACANT);
                     } else if (neighbors == 3) {
-                        world[i][j] = HERBIVORE;
+                        setInWorld(i, j, HERBIVORE);
                     }
                 }
             }
@@ -304,6 +318,10 @@ public class Life implements Runnable {
             init();
             start();
         }
+    }
+
+    public synchronized void setInWorld(int x, int y, int cell) {
+        world[x][y] = cell;
     }
 
 } // class Life
