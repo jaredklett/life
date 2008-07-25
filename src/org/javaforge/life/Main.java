@@ -70,6 +70,8 @@ public class Main {
                             life.setCellSize(life.getCellSize() - 1);
                         else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
                             life.setCellSize(life.getCellSize() + 1);
+                        else if (e.getKeyCode() == KeyEvent.VK_P)
+                            life.addPredator();
                     }
                     public void keyReleased(KeyEvent e) {
                         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {

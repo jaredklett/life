@@ -31,6 +31,7 @@
 package org.javaforge.life;
 
 import java.awt.*;
+import java.util.Random;
 
 /**
  * My version of the Conway's Game of Life.
@@ -42,8 +43,12 @@ import java.awt.*;
 
 public class Life implements Runnable {
 
+    public static final int VACANT = 0;
+    public static final int HERBIVORE = 1;
+    public static final int PREDATOR = 2;
+
     private Window window;
-    private boolean[][] world;
+    private int[][] world;
 
     private Dimension d;
 
@@ -95,12 +100,12 @@ public class Life implements Runnable {
             h = d.height;
         }
         // Create a new world
-        world = new boolean[w / cellSize][h / cellSize];
+        world = new int[w / cellSize][h / cellSize];
         // Seed the world
-        for (boolean[] aWorld : world) {
+        Random random = new Random();
+        for (int[] aWorld : world) {
             for (int j = 0; j < aWorld.length; j++) {
-                double random = Math.random();
-                aWorld[j] = random < 0.1;
+                aWorld[j] = random.nextInt(PREDATOR);
             }
         }
         offscreen = window.createImage(w, h);
@@ -117,11 +122,22 @@ public class Life implements Runnable {
     }
 
     public void reseed() {
-        for (boolean[] aWorld : world) {
+        Random random = new Random();
+        for (int[] aWorld : world) {
             for (int j = 0; j < aWorld.length; j++) {
-                if (!aWorld[j]) {
-                    double random = Math.random();
-                    aWorld[j] = random < 0.1;
+                if (aWorld[j] == VACANT) {
+                    aWorld[j] = random.nextInt(PREDATOR);
+                }
+            }
+        }
+    }
+
+    public void addPredator() {
+        for (int[] aWorld : world) {
+            for (int j = 0; j < aWorld.length; j++) {
+                if (aWorld[j] == VACANT) {
+                    aWorld[j] = PREDATOR;
+                    return;
                 }
             }
         }
@@ -151,7 +167,7 @@ public class Life implements Runnable {
     }
 
     public void updateWorld() {
-        boolean[][] tempworld = new boolean[world.length][world[0].length];
+        int[][] tempworld = new int[world.length][world[0].length];
         for (int i = 0; i < world.length; i++) {
             System.arraycopy(world[i], 0, tempworld[i], 0, world[i].length);
         }
@@ -172,35 +188,58 @@ public class Life implements Runnable {
                 } else if (j == world[i].length - 1) {
                     bottom = 0;
                 }
-                int neighbors = 0;
-                if (tempworld[left][top]) {
-                    neighbors++;
-                }
-                if (tempworld[i][top]) {
-                    neighbors++;
-                }
-                if (tempworld[right][top]) {
-                    neighbors++;
-                }
-                if (tempworld[left][j]) {
-                    neighbors++;
-                }
-                if (tempworld[right][j]) {
-                    neighbors++;
-                }
-                if (tempworld[left][bottom]) {
-                    neighbors++;
-                }
-                if (tempworld[i][bottom]) {
-                    neighbors++;
-                }
-                if (tempworld[right][bottom]) {
-                    neighbors++;
-                }
-                if ((neighbors < 2) || (neighbors > 3)) {
-                    world[i][j] = false;
-                } else if (neighbors == 3) {
-                    world[i][j] = true;
+                if (world[i][j] == PREDATOR) {
+                    if (tempworld[left][top] == HERBIVORE) {
+                        world[left][top] = PREDATOR;
+                    } else if (tempworld[i][top] == HERBIVORE) {
+                        world[i][top] = PREDATOR;
+                    } else if (tempworld[right][top] == HERBIVORE) {
+                        world[right][top] = PREDATOR;
+                    } else if (tempworld[left][j] == HERBIVORE) {
+                        world[left][j] = PREDATOR;
+                    } else if (tempworld[right][j] == HERBIVORE) {
+                        world[right][j] = PREDATOR;
+                    } else if (tempworld[left][bottom] == HERBIVORE) {
+                        world[left][bottom] = PREDATOR;
+                    } else if (tempworld[i][bottom] == HERBIVORE) {
+                        world[i][bottom] = PREDATOR;
+                    } else if (tempworld[right][bottom] == HERBIVORE) {
+                        world[right][bottom] = PREDATOR;
+                    } else {
+                        world[right][bottom] = PREDATOR;
+                    }
+                    world[i][j] = VACANT;
+                } else {
+                    int neighbors = 0;
+                    if (tempworld[left][top] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[i][top] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[right][top] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[left][j] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[right][j] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[left][bottom] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[i][bottom] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if (tempworld[right][bottom] == HERBIVORE) {
+                        neighbors++;
+                    }
+                    if ((neighbors < 2) || (neighbors > 3)) {
+                        world[i][j] = VACANT;
+                    } else if (neighbors == 3) {
+                        world[i][j] = HERBIVORE;
+                    }
                 }
             }
         }
@@ -211,8 +250,11 @@ public class Life implements Runnable {
         buffer.fillRect(0, 0, d.width, d.height);
         for (int i = 0; i < world.length; i++) {
             for (int j = 0; j < world[i].length; j++) {
-                if (world[i][j]) {
-                    buffer.setColor(Color.cyan);
+                if (world[i][j] == HERBIVORE) {
+                    buffer.setColor(Color.CYAN);
+                    buffer.fillOval(j * cellSize, i * cellSize, cellSize, cellSize);
+                } else if (world[i][j] == PREDATOR) {
+                    buffer.setColor(Color.RED);
                     buffer.fillOval(j * cellSize, i * cellSize, cellSize, cellSize);
                 }
             }
