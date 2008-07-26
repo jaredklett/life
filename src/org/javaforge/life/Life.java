@@ -67,7 +67,7 @@ public class Life implements Runnable {
     private Label leftLabel = new Label("Left : smaller");
     private Label pLabel = new Label("P : predator");
     public static final int DEFAULT_CELL_SIZE = 5;
-    public static final int RESEED_LIMIT = 2000;
+    public static final int RESEED_LIMIT = 3000;
 
     public Life(Window window) {
         this.window = window;
@@ -148,30 +148,26 @@ public class Life implements Runnable {
         sizeLabel.setBounds(0, 48, 100, 20);
 
         window.add(pLabel);
-        pLabel.setBounds(0, d.height - 20, 200, 20);
+        pLabel.setBounds(0, d.height - 20, 120, 20);
 
         window.add(rightLabel);
-        rightLabel.setBounds(0, d.height - 40, 200, 20);
+        rightLabel.setBounds(0, d.height - 40, 120, 20);
 
         window.add(leftLabel);
-        leftLabel.setBounds(0, d.height - 60, 200, 20);
+        leftLabel.setBounds(0, d.height - 60, 120, 20);
 
         window.add(downLabel);
-        downLabel.setBounds(0, d.height - 80, 200, 20);
+        downLabel.setBounds(0, d.height - 80, 120, 20);
 
         window.add(upLabel);
-        upLabel.setBounds(0, d.height - 100, 200, 20);
+        upLabel.setBounds(0, d.height - 100, 120, 20);
     }
 
     public void reseed() {
         Random random = new Random();
         for (int[] aWorld : world) {
             for (int j = 0; j < aWorld.length; j++) {
-                if (aWorld[j] == VACANT) {
-                    aWorld[j] = random.nextInt(PREDATOR);
-                } else if (aWorld[j] == PREDATOR) {
-                    aWorld[j] = VACANT;
-                }
+                aWorld[j] = random.nextInt(PREDATOR);
             }
         }
     }
@@ -192,10 +188,9 @@ public class Life implements Runnable {
         int c = 0;
         int reseedCount = 1;
         while (running) {
-            if (c > (RESEED_LIMIT * reseedCount)) {
+            if (c > RESEED_LIMIT) {
                 reseed();
                 c = 0;
-                reseedCount++;
             }
             //countdown.setText("Next panspermic event in " + Integer.toString(RESEED_LIMIT - c) + " iterations");
             countdown.setText(Integer.toString((RESEED_LIMIT * reseedCount) - c));
